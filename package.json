@@ -1,0 +1,44 @@
+{
+  "name": "@m-gris/mcp-db",
+  "version": "0.1.0",
+  "description": "One-command database MCP server setup for Claude Code - uses pick-dsn for DSN selection",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "mcp-db": "./dist/bin/mcp-db.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/bin/mcp-db.ts",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "database",
+    "dsn",
+    "dbhub",
+    "postgres",
+    "mysql",
+    "cli"
+  ],
+  "author": "m-gris",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/m-gris/mcp-db"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "pick-dsn": "file:../pick-dsn"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0"
+  }
+}
