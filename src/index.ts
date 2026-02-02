@@ -6,10 +6,10 @@ import { pickDsn, mask } from 'pick-dsn'
 import { writeDbhubConfig, getDbhubCommand } from './backends/dbhub.js'
 import { removeMcpServer, addMcpServer, isClaudeAvailable } from './claude.js'
 import { appendFile, access } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
 
 export interface SetupOptions {
-  /** Working directory (default: cwd) */
+  /** Working directory (default: auto-detect from .git or cwd) */
   readonly cwd?: string
   /** MCP server name (default: 'dbhub') */
   readonly serverName?: string
@@ -22,6 +22,35 @@ export interface SetupOptions {
 }
 
 /**
+ * Find project root by walking up to find .git directory.
+ * Pure computation: given a starting dir, return project root or null.
+ *
+ * @param startDir - Directory to start searching from
+ * @returns Project root path or null if not found
+ */
+export async function findProjectRoot(startDir: string): Promise<string | null> {
+  let currentDir = startDir
+  const root = dirname('/') // platform-agnostic root
+
+  while (currentDir !== root) {
+    try {
+      await access(join(currentDir, '.git'))
+      return currentDir
+    } catch {
+      // .git not found, continue up
+      const parentDir = dirname(currentDir)
+      if (parentDir === currentDir) {
+        // Reached root without finding .git
+        break
+      }
+      currentDir = parentDir
+    }
+  }
+
+  return null
+}
+
+/**
  * Main setup flow:
  * 1. Pick DSN using pick-dsn
  * 2. Generate config file
@@ -29,13 +58,23 @@ export interface SetupOptions {
  * 4. Register with Claude Code
  */
 export async function setup(options: SetupOptions = {}): Promise<void> {
+  // Determine working directory: explicit cwd > project root > process.cwd()
+  let workingDir: string
+  if (options.cwd) {
+    workingDir = options.cwd
+  } else {
+    const projectRoot = await findProjectRoot(process.cwd())
+    workingDir = projectRoot ?? process.cwd()
+  }
+
   const {
-    cwd = process.cwd(),
     serverName = 'dbhub',
     backend = 'dbhub',
     readonly = true,
     maxRows = 1000
   } = options
+
+  const cwd = workingDir
 
   // Check Claude CLI
   const claudeAvailable = await isClaudeAvailable()
@@ -105,3 +144,4 @@ async function ensureGitignore(dir: string, pattern: string): Promise<void> {
 export { pickDsn, mask, normalize, isDbDsn } from 'pick-dsn'
 export { generateDbhubToml, writeDbhubConfig } from './backends/dbhub.js'
 export { addMcpServer, removeMcpServer, isClaudeAvailable } from './claude.js'
+// findProjectRoot is exported above
