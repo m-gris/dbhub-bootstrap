@@ -11,16 +11,31 @@ One command to give your AI assistant database access.
 - Registering the MCP server with your client
 - Remembering the incantation for each new project
 
-**dbhub-bootstrap** reduces this to:
+**dbhub-bootstrap** reduces this to one command.
 
+## Install
+
+**Option 1: curl** (universal)
 ```bash
 curl -fsSL https://raw.githubusercontent.com/m-gris/dbhub-bootstrap/main/bootstrap.sh | bash
+```
+
+**Option 2: Homebrew** (macOS/Linux)
+```bash
+brew tap m-gris/dbhub-bootstrap https://github.com/m-gris/dbhub-bootstrap
+brew install dbhub-bootstrap
+```
+
+**Option 3: GitHub CLI**
+```bash
+gh extension install m-gris/dbhub-bootstrap
+gh dbhub init
 ```
 
 Then, in any project:
 
 ```bash
-just -g mcp dbhub init    # interactive DSN picker, writes config, registers MCP
+dbhub init    # or: just -g mcp dbhub init
 ```
 
 Done. Your AI can now query your database.
@@ -41,7 +56,7 @@ The init wizard:
 
 ## Requirements
 
-- macOS with [Homebrew](https://brew.sh)
+- macOS or Linux (x86_64 or arm64)
 - [Claude Code](https://claude.ai/code) CLI
 
 ## How It Works
