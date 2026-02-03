@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname "$0")/../lib/all.sh"
+
+root=$(project_root)
+path=$(config_path "$root")
+echo "Project: $root"
+[[ -f "$path" ]] && echo "Config:  $path" || echo "Config:  (none)"
+claude mcp list 2>/dev/null | grep -q "$MCP_NAME" && echo "MCP:     registered" || echo "MCP:     not registered"

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname "$0")/../lib/all.sh"
+
+root=$(project_root)
+found=$(dsns)
+[[ -n "$found" ]] && dsn=$(echo "$found" | choose "Select database:" | cut -d= -f2-) || dsn=$(input "postgresql://user:pass@host:5432/db")
+[[ -z "$dsn" ]] && { warn "No DSN provided"; exit 1; }
+
+path=$(config_path "$root")
+toml "$dsn" > "$path"
+gitignore_add "$root/.gitignore" "$MCP_CONFIG"
+register_mcp "$path"
+
+success "✅ Done!" "DSN: $(mask_password "$dsn")" "Config: $path" "" "Restart Claude Code, run /mcp to verify."

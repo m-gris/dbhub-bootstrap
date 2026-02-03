@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname "$0")/../lib/all.sh"
+
+claude mcp remove "$MCP_NAME" 2>/dev/null && echo "Removed: $MCP_NAME" || echo "Not registered"

@@ -1,3 +1,5 @@
+> **ATOMIZED** → Epic: mcp-db-bto | 2026-02-03
+
 # Plan: Bootstrap Installer for mcp-db
 
 ## Goal
@@ -185,6 +187,7 @@ source "$(dirname "$0")/../lib/all.sh"
 root=$(project_root)
 found=$(dsns)
 [[ -n "$found" ]] && dsn=$(echo "$found" | choose "Select database:" | cut -d= -f2-) || dsn=$(input "postgresql://user:pass@host:5432/db")
+[[ -z "$dsn" ]] && { warn "No DSN provided"; exit 1; }
 
 path=$(config_path "$root")
 toml "$dsn" > "$path"
