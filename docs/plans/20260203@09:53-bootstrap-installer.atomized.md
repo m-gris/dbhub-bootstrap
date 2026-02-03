@@ -8,7 +8,7 @@ Plug-and-play onboarding for Claude Code database access.
 
 **Entry point:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/m-gris/mcp-db/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/m-gris/dbhub-bootstrap/main/bootstrap.sh | bash
 ```
 
 ---
@@ -310,7 +310,7 @@ remove:
 
 ```bash
 # New user (nothing installed)
-curl -fsSL https://raw.githubusercontent.com/m-gris/mcp-db/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/m-gris/dbhub-bootstrap/main/bootstrap.sh | bash
 
 # After bootstrap
 just -g mcp dbhub init      # set up database

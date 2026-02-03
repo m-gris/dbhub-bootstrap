@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_beads_beads__ready",
+      "mcp__plugin_beads_beads__show",
+      "mcp__plugin_beads_beads__list",
+      "mcp__plugin_beads_beads__update",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(chmod:*)",
+      "Bash(bash -n:*)",
+      "Bash(just --fmt:*)",
+      "Bash(just --dump:*)",
+      "mcp__plugin_beads_beads__close",
+      "Bash(source lib/all.sh)",
+      "Bash(missing_deps)",
+      "Bash(dsns)",
+      "Bash(toml:*)",
+      "Bash(mask_password \"postgres://user:secret123@localhost/db\")",
+      "Bash(config_path:*)",
+      "Bash(bash -c 'source /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db/lib/all.sh && echo \"\"=== missing_deps ===\"\" && missing_deps && echo \"\"=== toml ===\"\" && toml \"\"postgres://test@localhost/db\"\" && echo \"\"=== mask_password ===\"\" && mask_password \"\"postgres://user:secret123@localhost/db\"\" && echo \"\"=== config_path ===\"\" && config_path \"\"/tmp/project\"\"')",
+      "Bash(bash -c 'source /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db/lib/all.sh && echo \"\"=== missing_deps ===\"\" && missing_deps && echo \"\"=== toml ===\"\" && toml \"\"postgres://test@localhost/db\"\" && echo \"\"=== mask_password ===\"\" && mask_password \"\"postgres://user:secret123@localhost/db\"\" && echo \"\"=== config_path ===\"\" && config_path \"\"/tmp/project\"\" && echo \"\"=== project_root ===\"\" && project_root')",
+      "Bash(/Users/marc/DATA_PROG/TYPSCRIPT/mcp-db/bin/dbhub-status:*)",
+      "Bash(/Users/marc/DATA_PROG/TYPSCRIPT/mcp-db/bin/dbhub-remove:*)",
+      "Bash(bd sync:*)",
+      "Bash(git -C /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db status)",
+      "Bash(git -C /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db log --oneline -5)",
+      "Bash(git -C /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db add lib/ bin/ bootstrap.sh config/ .beads/ docs/plans/20260203@09:53-bootstrap-installer.atomized.md)",
+      "Bash(git -C /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db rm:*)",
+      "Bash(git -C /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db diff --cached --stat)",
+      "Bash(git -C /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db remote -v)",
+      "mcp__plugin_beads_beads__stats",
+      "Bash(git -C /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db add .gitignore .gitattributes AGENTS.md CLAUDE.md pnpm-lock.yaml)",
+      "Bash(git -C /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db log --oneline -3)",
+      "Bash(gh repo create --help:*)",
+      "Bash(git -C /Users/marc/DATA_PROG/TYPSCRIPT/mcp-db add -A)"
+    ]
+  }
+}

@@ -4,8 +4,8 @@ set -euo pipefail
 # Bootstrap is self-contained until repo is cloned.
 # Inline minimal dependencies, then delegate to libs.
 
-INSTALL_DIR="$HOME/.mcp-db"
-REPO_URL="https://github.com/m-gris/mcp-db.git"
+INSTALL_DIR="$HOME/.dbhub-bootstrap"
+REPO_URL="https://github.com/m-gris/dbhub-bootstrap.git"
 
 # --- Phase 1: Minimal inline detection (no libs yet) ---
 

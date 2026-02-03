@@ -1,6 +1,6 @@
 # dbhub - Database access for Claude Code
 
-_bin := "$HOME/.mcp-db/bin"
+_bin := "$HOME/.dbhub-bootstrap/bin"
 
 # Initialize dbhub for current project
 [no-cd]
