@@ -12,6 +12,11 @@ INSTALL_DIR="$HOME/.dbhub-bootstrap"
 REPO_URL="https://github.com/m-gris/dbhub-bootstrap.git"
 BIN_DIR="$HOME/.local/bin"
 
+# Justfile paths (must be absolute for just to resolve)
+JUST_CONFIG_DIR="$HOME/.config/just"
+JUST_MCP_DIR="$JUST_CONFIG_DIR/mcp"
+GLOBAL_JUSTFILE="$HOME/.justfile"
+
 # Tool definitions: repo|version|binary_name
 declare -A TOOLS=(
     [gum]="charmbracelet/gum|0.14.5|gum"
@@ -101,6 +106,16 @@ install_via_brew() {
     brew install "$tool"
 }
 
+# ensure_line FILE LINE -> ensures LINE exists in FILE (creates file if needed)
+ensure_line() {
+    local file=$1 line=$2
+    if [[ ! -f "$file" ]]; then
+        echo "$line" > "$file"
+    elif ! grep -qF "$line" "$file"; then
+        echo "$line" >> "$file"
+    fi
+}
+
 # =============================================================================
 # ORCHESTRATION — wires it all together
 # =============================================================================
@@ -141,11 +156,16 @@ done
 # Ensure BIN_DIR is in PATH for this session
 export PATH="$BIN_DIR:$PATH"
 
-# --- Phase 3: Clone repo, then use libs ---
+# --- Phase 3: Clone repo and setup justfile ---
 
 if [[ ! -d "$INSTALL_DIR" ]]; then
-    gum spin --title "Cloning mcp-db..." -- git clone "$REPO_URL" "$INSTALL_DIR"
+    gum spin --title "Cloning dbhub-bootstrap..." -- git clone "$REPO_URL" "$INSTALL_DIR"
 fi
+
+# Setup global justfile with mcp module
+mkdir -p "$JUST_MCP_DIR"
+ensure_line "$JUST_MCP_DIR/mod.just" "mod dbhub \"$INSTALL_DIR/config/just/dbhub.just\""
+ensure_line "$GLOBAL_JUSTFILE" "mod mcp \"$JUST_MCP_DIR\""
 
 # Now libs exist, source them
 source "$INSTALL_DIR/lib/all.sh"
