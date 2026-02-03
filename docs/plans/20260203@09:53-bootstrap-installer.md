@@ -117,7 +117,8 @@ register_mcp() {
 
 # gitignore_add :: path entry -> ()
 gitignore_add() {
-    [[ -f "$1" ]] && grep -qxF "$2" "$1" || echo "$2" >> "$1"
+    [[ -f "$1" ]] || return 0  # No gitignore, skip silently
+    grep -qxF "$2" "$1" || echo "$2" >> "$1"
 }
 ```
 
@@ -159,8 +160,8 @@ EOF
 # mask_password :: dsn -> masked dsn
 mask_password() { echo "$1" | sed -E 's|(://[^:]+:)[^@]+(@)|\1****\2|'; }
 
-# config_path :: () -> path
-config_path() { echo "$(project_root)/$MCP_CONFIG"; }
+# config_path :: root_path -> path  (pure: takes input, no side effects)
+config_path() { echo "$1/$MCP_CONFIG"; }
 ```
 
 ### `lib/all.sh`
@@ -181,12 +182,13 @@ source "$_dir/compute.sh"
 set -euo pipefail
 source "$(dirname "$0")/../lib/all.sh"
 
+root=$(project_root)
 found=$(dsns)
 [[ -n "$found" ]] && dsn=$(echo "$found" | choose "Select database:" | cut -d= -f2-) || dsn=$(input "postgresql://user:pass@host:5432/db")
 
-path=$(config_path)
+path=$(config_path "$root")
 toml "$dsn" > "$path"
-gitignore_add "$(project_root)/.gitignore" ".dbhub.toml"
+gitignore_add "$root/.gitignore" "$MCP_CONFIG"
 register_mcp "$path"
 
 success "✅ Done!" "DSN: $(mask_password "$dsn")" "Config: $path" "" "Restart Claude Code, run /mcp to verify."
@@ -198,8 +200,9 @@ success "✅ Done!" "DSN: $(mask_password "$dsn")" "Config: $path" "" "Restart C
 set -euo pipefail
 source "$(dirname "$0")/../lib/all.sh"
 
-path=$(config_path)
-echo "Project: $(project_root)"
+root=$(project_root)
+path=$(config_path "$root")
+echo "Project: $root"
 [[ -f "$path" ]] && echo "Config:  $path" || echo "Config:  (none)"
 claude mcp list 2>/dev/null | grep -q "$MCP_NAME" && echo "MCP:     registered" || echo "MCP:     not registered"
 ```
@@ -218,32 +221,62 @@ claude mcp remove "$MCP_NAME" 2>/dev/null && echo "Removed: $MCP_NAME" || echo "
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-for lib in config detect actions ui compute; do
-    source "$SCRIPT_DIR/lib/$lib.sh"
-done
+# Bootstrap is self-contained until repo is cloned.
+# Inline minimal dependencies, then delegate to libs.
 
-# Detect
-missing=$(missing_deps)
+INSTALL_DIR="$HOME/.mcp-db"
+REPO_URL="https://github.com/m-gris/mcp-db.git"
 
-# Display plan
+# --- Phase 1: Minimal inline detection (no libs yet) ---
+
+missing_brew() { command -v brew >/dev/null || echo "brew"; }
+missing_gum()  { command -v gum  >/dev/null || echo "gum"; }
+missing_just() { command -v just >/dev/null || echo "just"; }
+
+missing=$(missing_brew; missing_gum; missing_just)
+
 echo "⚡ Claude Database Setup"
 echo ""
-[[ -z "$missing" ]] && echo "✓ All dependencies installed" || echo "$missing" | while read -r d; do echo "  ⏳ $d (will install)"; done
+if [[ -z "$missing" ]]; then
+    echo "✓ All dependencies installed"
+else
+    echo "$missing" | while read -r d; do [[ -n "$d" ]] && echo "  ⏳ $d (will install)"; done
+fi
 echo ""
 
-# Confirm
-confirm "Proceed?" || exit 0
+# Confirm (inline, no gum yet)
+read -p "Proceed? [Y/n] " -n 1 -r
+echo
+[[ $REPLY =~ ^[Nn]$ ]] && exit 0
 
-# Install missing
-echo "$missing" | while read -r dep; do
-    [[ -n "$dep" ]] && spin "Installing $dep..." install "$dep"
-done
+# --- Phase 2: Install prerequisites ---
 
-# Clone repo
-spin "Setting up mcp-db..." clone_repo
+install_if_missing() {
+    command -v "$1" >/dev/null && return 0
+    echo "Installing $1..."
+    brew install "$1" || { echo "FAIL: brew install $1" >&2; exit 1; }
+}
 
-# Done
+# Brew must exist (manual install if missing)
+if ! command -v brew >/dev/null; then
+    echo "Homebrew required. Install from https://brew.sh"
+    exit 1
+fi
+
+install_if_missing gum
+install_if_missing just
+
+# --- Phase 3: Clone repo, then use libs ---
+
+if [[ ! -d "$INSTALL_DIR" ]]; then
+    gum spin --title "Cloning mcp-db..." -- git clone "$REPO_URL" "$INSTALL_DIR"
+fi
+
+# Now libs exist, source them
+source "$INSTALL_DIR/lib/all.sh"
+
+# --- Phase 4: Done ---
+
 success "✅ Bootstrap complete!" "" "Run: just -g mcp dbhub init"
 ```
 
