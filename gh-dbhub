@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# =============================================================================
+# DATA
+# =============================================================================
+
+INSTALL_DIR="$HOME/.dbhub-bootstrap"
+BOOTSTRAP_URL="https://raw.githubusercontent.com/m-gris/dbhub-bootstrap/main/bootstrap.sh"
+
+# =============================================================================
+# COMPUTATIONS (pure - no side effects)
+# =============================================================================
+
+usage() {
+    cat <<EOF
+Usage: gh dbhub <command>
+
+Commands:
+  init    Configure database for current project
+  status  Show current configuration
+  remove  Unregister MCP server
+EOF
+}
+
+# =============================================================================
+# ACTIONS (side effects, kept minimal)
+# =============================================================================
+
+bootstrap() {
+    echo "dbhub-bootstrap not installed. Running bootstrap..."
+    curl -fsSL "$BOOTSTRAP_URL" | bash
+}
+
+# =============================================================================
+# ORCHESTRATION
+# =============================================================================
+
+[[ ! -d "$INSTALL_DIR" ]] && { bootstrap; exit $?; }
+
+case "${1:-}" in
+    init)   just -g mcp dbhub init ;;
+    status) just -g mcp dbhub status ;;
+    remove) just -g mcp dbhub remove ;;
+    *)      usage; exit 1 ;;
+esac

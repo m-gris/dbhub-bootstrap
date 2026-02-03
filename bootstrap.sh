@@ -8,6 +8,8 @@ set -euo pipefail
 # DATA — no logic, just facts
 # =============================================================================
 
+AUTO=false  # Set by --auto or -y flag (non-interactive mode)
+
 INSTALL_DIR="$HOME/.dbhub-bootstrap"
 REPO_URL="https://github.com/m-gris/dbhub-bootstrap.git"
 BIN_DIR="$HOME/.local/bin"
@@ -34,6 +36,25 @@ declare -A PLATFORM_MAP=(
 # =============================================================================
 # COMPUTATIONS — pure functions, no side effects
 # =============================================================================
+
+# parse_args ARGS... -> sets AUTO flag
+parse_args() {
+    for arg in "$@"; do
+        case "$arg" in
+            --auto|-y) AUTO=true ;;
+            --help|-h)
+                cat <<EOF
+Usage: bootstrap.sh [OPTIONS]
+
+Options:
+  --auto, -y    Non-interactive mode (skip confirmation prompts)
+  --help, -h    Show this help message
+EOF
+                exit 0
+                ;;
+        esac
+    done
+}
 
 detect_os() {
     case "$(uname -s)" in
@@ -120,6 +141,8 @@ ensure_line() {
 # ORCHESTRATION — wires it all together
 # =============================================================================
 
+parse_args "$@"
+
 OS=$(detect_os)
 ARCH=$(detect_arch)
 
@@ -140,9 +163,11 @@ else
 fi
 echo ""
 
-read -p "Proceed? [Y/n] " -n 1 -r
-echo
-[[ $REPLY =~ ^[Nn]$ ]] && exit 0
+if [[ "$AUTO" == false ]]; then
+    read -p "Proceed? [Y/n] " -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Nn]$ ]] && exit 0
+fi
 
 # Install missing tools
 for tool in $missing; do
