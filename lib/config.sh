@@ -9,6 +9,6 @@ readonly REPO_URL="https://github.com/m-gris/dbhub-bootstrap.git"
 readonly MCP_NAME="dbhub"
 readonly MCP_CONFIG=".dbhub.toml"
 readonly MCP_PACKAGE="@bytebase/dbhub"
-readonly MCP_VERSION="0.1.5"  # Pin for reproducibility
+readonly MCP_VERSION="latest"  # Use latest; pin to specific version (e.g., "0.16.0") if needed
 
 readonly DSN_PATTERN='(database_url|db_|dsn|connection_string)'
