@@ -1,5 +1,6 @@
 node_modules/
 dist/
+mcp-db-bin
 *.log
 .DS_Store
 

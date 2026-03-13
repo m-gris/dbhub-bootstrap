@@ -10,8 +10,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsx src/bin/mcp-db.ts",
-    "clean": "rm -rf dist",
+    "build:bin": "bun build --compile --outfile=mcp-db-bin ./src/bin/mcp-db.ts",
+    "dev": "bun run src/bin/mcp-db.ts",
+    "clean": "rm -rf dist mcp-db-bin",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
